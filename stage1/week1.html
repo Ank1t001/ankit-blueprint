@@ -2766,7 +2766,7 @@ async function syncAllToAPI() {
   } catch(e) { setSyncStatus(''); }
 }
 
-async function apiDeleteasync function apiDelete(id) {
+async function apiDelete(id) {
   if (!accessToken) return;
   try {
     await fetch(`${API_URL}/progress?id=${encodeURIComponent(id)}`, {
