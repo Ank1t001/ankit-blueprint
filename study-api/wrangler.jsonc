@@ -1,0 +1,17 @@
+{
+  "name": "study-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-01",
+
+  "vars": {
+    "ALLOWED_ORIGIN": "https://ankit-blueprint.pages.dev"
+  },
+
+  "kv_namespaces": [
+  {
+    "binding": "PROGRESS_KV",
+    "id": "ec823867ea1f4937a42860635b492051",
+    "preview_id": "a1b9a49b3086421c80948008a9e60aad"
+  }
+]
+}
