@@ -2654,7 +2654,7 @@ async function initAuth() {
   }
 }
 
-async async function signIn() {
+async function signIn() {
   await auth0Client.loginWithRedirect({
     authorizationParams: {
       redirect_uri: window.location.origin + window.location.pathname,
@@ -2668,7 +2668,9 @@ async function signOut() {
 }
 
 async function onSignedIn() {
-  accessToken = await auth0Client.getTokenSilently();
+  accessToken = await auth0Client.getTokenSilently({
+    authorizationParams: { audience: AUTH0_AUDIENCE }
+  });
   currentUser = await auth0Client.getUser();
 
   // Hide overlay, show user badge
