@@ -21,3 +21,27 @@
     return raw ? JSON.parse(raw) : null;
   };
 })();
+
+// ---- Cloudflare Worker (Phase A: public KV) helpers ----
+window.cloudSave = async function ({ stage, week, data }) {
+  const base = window.APP_CONFIG?.API_URL;
+  if (!base) throw new Error("Missing API_URL in assets/config.js");
+
+  const res = await fetch(`${base}/progress`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ stage, week, data }),
+  });
+
+  if (!res.ok) throw new Error(`Save failed: ${res.status}`);
+  return res.json();
+};
+
+window.cloudLoad = async function ({ stage, week }) {
+  const base = window.APP_CONFIG?.API_URL;
+  if (!base) throw new Error("Missing API_URL in assets/config.js");
+
+  const res = await fetch(`${base}/progress?stage=${encodeURIComponent(stage)}&week=${encodeURIComponent(week)}`);
+  if (!res.ok) throw new Error(`Load failed: ${res.status}`);
+  return res.json();
+};
