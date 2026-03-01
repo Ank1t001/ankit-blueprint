@@ -54,14 +54,16 @@
 
     // Bind buttons AFTER they exist
     if (btnSignIn) {
-      btnSignIn.onclick = async () => {
-        await auth0Client.loginWithRedirect({
-          authorizationParams: {
-            audience: AUTH0_AUDIENCE,
-            redirect_uri: window.location.origin + window.location.pathname
-          }
-        });
-      };
+      btnSignIn.onclick = async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  await auth0Client.loginWithRedirect({
+    authorizationParams: {
+      audience: AUTH0_AUDIENCE,
+      redirect_uri: window.location.origin + window.location.pathname
+    }
+  });
+};
     }
 
     if (btnContinue) {
