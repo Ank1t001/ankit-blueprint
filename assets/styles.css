@@ -1,0 +1,10 @@
+:root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+body { margin: 0; background: #0b0f19; color: #e6e9f2; }
+a { color: #8ab4ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 900px; margin: 0 auto; padding: 28px; }
+section { background: rgba(255,255,255,0.06); padding: 16px 18px; border-radius: 14px; margin: 14px 0; }
+h1 { margin: 0 0 16px; font-size: 28px; }
+h2 { margin: 0 0 8px; font-size: 18px; }
+ul { margin: 0; padding-left: 18px; }
+li { margin: 6px 0; }
