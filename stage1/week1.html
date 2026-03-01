@@ -117,6 +117,8 @@ body {
   padding: 12px 28px; font-size: 15px; font-weight: 600; cursor: pointer;
   width: 100%; transition: background 0.2s;
 }
+.auth-btn.secondary{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);} 
+.auth-btn.secondary:hover{background:rgba(255,255,255,.16);} 
 .auth-btn:hover { background: #1d4ed8; }
 #user-badge {
   display: none; align-items: center; gap: 8px;
@@ -1356,7 +1358,8 @@ body.draw-mode .sidebar { pointer-events: none; }
     <div class="auth-logo">Ankit's Blueprint</div>
     <div class="auth-sub">Stage 1 · Week 1 · Cloud Fundamentals</div>
     <div class="auth-desc">Sign in to sync your highlights, notes and drawings across all your devices.</div>
-    <button class="auth-btn" onclick="signIn()">Sign in to continue</button>
+    <button class="auth-btn" id="btn-gate-continue" type="button">Continue</button>
+    <button class="auth-btn secondary" id="btn-gate-signin" type="button">Sign in</button>
   </div>
 </div>
 
@@ -2575,7 +2578,7 @@ async function initAuth() {
     domain:   AUTH0_DOMAIN,
     clientId: AUTH0_CLIENT_ID,
     authorizationParams: {
-      redirect_uri: 'https://cyber-security-plan.pages.dev/stage1/week1.html',
+      redirect_uri: window.location.origin + window.location.pathname,
       audience: AUTH0_AUDIENCE,
     }
   });
@@ -2587,15 +2590,25 @@ async function initAuth() {
   }
 
   const isAuthenticated = await auth0Client.isAuthenticated();
+  const gateKey = `bp_access:${WEEK_ID}`;
+  const hasGuestAccess = localStorage.getItem(gateKey) === '1';
   if (isAuthenticated) {
     await onSignedIn();
+  } else if (hasGuestAccess) {
+    document.getElementById('auth-overlay').classList.add('hidden');
+    await loadAnnotations();
   } else {
     document.getElementById('auth-overlay').classList.remove('hidden');
   }
 }
 
-async function signIn() {
-  await auth0Client.loginWithRedirect();
+async async function signIn() {
+  await auth0Client.loginWithRedirect({
+    authorizationParams: {
+      redirect_uri: window.location.origin + window.location.pathname,
+      audience: AUTH0_AUDIENCE,
+    }
+  });
 }
 
 async function signOut() {
@@ -2635,23 +2648,25 @@ function setSyncStatus(state) {
 async function loadAnnotations() {
   try {
     setSyncStatus('syncing');
-    const res = await fetch(`${API_URL}/annotations?week_id=${WEEK_ID}`, {
-      headers: authHeaders()
-    });
+    const res = await fetch(`${API_URL}/progress?stage=stage1&week=week1`);
     if (!res.ok) throw new Error('API error');
-    const { annotations: remote } = await res.json();
+    const payload = await res.json();
+    const remote = payload && payload.annotations ? payload.annotations : [];
     setSyncStatus('saved');
+
+    // Clear current annotations before restoring
+    annotations = [];
     remote.forEach(a => {
+      annotations.push(a);
       if (a.type === 'highlight') restoreHighlight(a);
       if (a.type === 'note')      restoreNote(a);
       if (a.type === 'drawing')   restoreDrawing(a);
     });
     updateCount();
     return;
-  } catch(e) {
+  } catch (e) {
     setSyncStatus('');
-    showToast('Cloud unavailable — using local storage');
-    loadFromLocalStorage();
+    showToast('Cloud unavailable (offline or API error).', 'warn');
   }
 }
 
@@ -3264,12 +3279,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
-<script>
-  window.STAGE_ID = "stage1";
-  window.WEEK_ID = "week1";
-</script>
-<script src="/assets/config.js"></script>
-<script src="/assets/app.js"></script>
 
 </body>
 </html>
