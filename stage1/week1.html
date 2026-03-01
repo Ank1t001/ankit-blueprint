@@ -10,11 +10,63 @@
   const WEEK_ID = 'stage1_week1';
   const API_URL = 'https://study-api.ankit-2b7.workers.dev';
   const AUTH0_DOMAIN    = 'taskmanager.ca.auth0.com';
-  const AUTH0_CLIENT_ID = 'rjZU0a141NKQYyA7fwKDIAiJIo2T60Pq';
+  const AUTH0_CLIENT_ID = 'h2yxDp3UADpY0A1LNNKeS9MT3v9j8mvY';
   const AUTH0_AUDIENCE  = 'https://ankit-blueprint-api';
 </script>
 <!-- Auth0 SPA SDK -->
 <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+<script>
+let auth0Client = null;
+
+async function initAuth() {
+  auth0Client = await createAuth0Client({
+    domain: "taskmanager.ca.auth0.com",
+    clientId: "h2yxDp3UADpY0A1LNNKeS9MT3v9j8mvY",
+    authorizationParams: {
+      audience: "https://ankit-blueprint-api",
+      redirect_uri: window.location.origin + window.location.pathname
+    }
+  });
+
+  // Handle redirect
+  if (window.location.search.includes("code=")) {
+    await auth0Client.handleRedirectCallback();
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  const isAuthenticated = await auth0Client.isAuthenticated();
+
+  if (!isAuthenticated) {
+    document.getElementById("authGate").style.display = "flex";
+    return;
+  }
+
+  // 🔥 This is the important part
+  const token = await auth0Client.getTokenSilently({
+    authorizationParams: {
+      audience: "https://ankit-blueprint-api"
+    }
+  });
+
+  window.__accessToken = token;
+
+  document.getElementById("authGate").style.display = "none";
+  startWeekApp();   // your existing function
+  startAutoSync();  // your existing autosync
+}
+
+// Sign-in button
+document.getElementById("btnSignIn")?.addEventListener("click", async () => {
+  await auth0Client.loginWithRedirect({
+    authorizationParams: {
+      audience: "https://ankit-blueprint-api",
+      redirect_uri: window.location.origin + window.location.pathname
+    }
+  });
+});
+
+document.addEventListener("DOMContentLoaded", initAuth);
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
