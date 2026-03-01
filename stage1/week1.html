@@ -49,31 +49,50 @@
     const isAuthenticated = await auth0Client.isAuthenticated();
 
     const authGate = document.getElementById("authGate");
-    const btnSignIn = document.getElementById("btnSignIn");
-    const btnContinue = document.getElementById("btnContinue");
+    const btnSignIn = document.getElementById("btn-gate-signin");
+const btnContinue = document.getElementById("btn-gate-continue");
+const btnLogout = document.getElementById("btn-logout");
 
     // Bind buttons AFTER they exist
     if (btnSignIn) {
-      btnSignIn.onclick = async (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  await auth0Client.loginWithRedirect({
-    authorizationParams: {
-      audience: AUTH0_AUDIENCE,
-      redirect_uri: window.location.origin + window.location.pathname
-    }
-  });
-};
-    }
+  btnSignIn.onclick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await auth0Client.loginWithRedirect({
+      authorizationParams: {
+        audience: AUTH0_AUDIENCE,
+        redirect_uri: window.location.origin + window.location.pathname
+      }
+    });
+  };
+}
 
-    if (btnContinue) {
-      btnContinue.onclick = async () => {
-        // Guest continues without token (UI only)
-        if (authGate) authGate.style.display = "none";
-        startWeekApp();
-        startAutoSync();
-      };
-    }
+if (btnContinue) {
+  btnContinue.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // guest mode (local-only)
+    const overlay = document.getElementById("auth-overlay") || document.getElementById("authGate");
+if (!isAuthenticated) {
+  if (overlay) overlay.classList.remove("hidden");
+  return;
+}
+if (overlay) overlay.classList.add("hidden");
+    if (overlay) overlay.classList.add("hidden");
+    startWeekApp();
+    startAutoSync();
+  };
+}
+
+if (btnLogout) {
+  btnLogout.onclick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await auth0Client.logout({
+      logoutParams: { returnTo: window.location.origin + window.location.pathname }
+    });
+  };
+}
 
     if (!isAuthenticated) {
       if (authGate) authGate.style.display = "flex";
