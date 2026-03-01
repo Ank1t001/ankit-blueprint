@@ -16,56 +16,82 @@
 <!-- Auth0 SPA SDK -->
 <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 <script>
-let auth0Client = null;
+  let auth0Client = null;
 
-async function initAuth() {
-  auth0Client = await createAuth0Client({
-    domain: "taskmanager.ca.auth0.com",
-    clientId: "h2yxDp3UADpY0A1LNNKeS9MT3v9j8mvY",
-    authorizationParams: {
-      audience: "https://ankit-blueprint-api",
-      redirect_uri: window.location.origin + window.location.pathname
+  async function waitForAuth0Sdk(timeoutMs = 8000) {
+    const start = Date.now();
+    while (typeof createAuth0Client !== "function") {
+      if (Date.now() - start > timeoutMs) {
+        throw new Error("Auth0 SDK not loaded (createAuth0Client missing)");
+      }
+      await new Promise(r => setTimeout(r, 50));
     }
-  });
-
-  // Handle redirect
-  if (window.location.search.includes("code=")) {
-    await auth0Client.handleRedirectCallback();
-    window.history.replaceState({}, document.title, window.location.pathname);
   }
 
-  const isAuthenticated = await auth0Client.isAuthenticated();
+  async function initAuth() {
+    await waitForAuth0Sdk();
 
-  if (!isAuthenticated) {
-    document.getElementById("authGate").style.display = "flex";
-    return;
+    auth0Client = await createAuth0Client({
+      domain: AUTH0_DOMAIN,
+      clientId: AUTH0_CLIENT_ID,
+      authorizationParams: {
+        audience: AUTH0_AUDIENCE,
+        redirect_uri: window.location.origin + window.location.pathname
+      }
+    });
+
+    // Handle redirect callback
+    if (window.location.search.includes("code=") && window.location.search.includes("state=")) {
+      await auth0Client.handleRedirectCallback();
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    const isAuthenticated = await auth0Client.isAuthenticated();
+
+    const authGate = document.getElementById("authGate");
+    const btnSignIn = document.getElementById("btnSignIn");
+    const btnContinue = document.getElementById("btnContinue");
+
+    // Bind buttons AFTER they exist
+    if (btnSignIn) {
+      btnSignIn.onclick = async () => {
+        await auth0Client.loginWithRedirect({
+          authorizationParams: {
+            audience: AUTH0_AUDIENCE,
+            redirect_uri: window.location.origin + window.location.pathname
+          }
+        });
+      };
+    }
+
+    if (btnContinue) {
+      btnContinue.onclick = async () => {
+        // Guest continues without token (UI only)
+        if (authGate) authGate.style.display = "none";
+        startWeekApp();
+        startAutoSync();
+      };
+    }
+
+    if (!isAuthenticated) {
+      if (authGate) authGate.style.display = "flex";
+      return;
+    }
+
+    const token = await auth0Client.getTokenSilently({
+      authorizationParams: { audience: AUTH0_AUDIENCE }
+    });
+
+    window.__accessToken = token;
+
+    if (authGate) authGate.style.display = "none";
+    startWeekApp();
+    startAutoSync();
   }
 
-  // 🔥 This is the important part
-  const token = await auth0Client.getTokenSilently({
-    authorizationParams: {
-      audience: "https://ankit-blueprint-api"
-    }
+  document.addEventListener("DOMContentLoaded", () => {
+    initAuth().catch(err => console.error(err));
   });
-
-  window.__accessToken = token;
-
-  document.getElementById("authGate").style.display = "none";
-  startWeekApp();   // your existing function
-  startAutoSync();  // your existing autosync
-}
-
-// Sign-in button
-document.getElementById("btnSignIn")?.addEventListener("click", async () => {
-  await auth0Client.loginWithRedirect({
-    authorizationParams: {
-      audience: "https://ankit-blueprint-api",
-      redirect_uri: window.location.origin + window.location.pathname
-    }
-  });
-});
-
-document.addEventListener("DOMContentLoaded", initAuth);
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
