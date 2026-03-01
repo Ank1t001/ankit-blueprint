@@ -1,47 +1,45 @@
+// assets/app.js — shared API helpers (Phase B: JWT protected)
 (function () {
-  const stage = window.STAGE_ID;
-  const week = window.WEEK_ID;
-  if (!stage || !week) {
-    console.error("Missing STAGE_ID or WEEK_ID");
-    return;
+  function getApiBase() {
+    // prefer window.APP_CONFIG.API_URL, fall back to global API_URL (week files)
+    return (window.APP_CONFIG && window.APP_CONFIG.API_URL) || window.API_URL || (typeof API_URL !== 'undefined' ? API_URL : null);
   }
 
-  const key = `progress:${stage}:${week}`;
+  window.getAccessToken = async function () {
+    // week page should set this after Auth0 login
+    return window.__accessToken || null;
+  };
 
-  // Demo: show a small banner so you know shared assets loaded
-  const banner = document.createElement("div");
-  banner.style.cssText = "position:fixed;bottom:14px;right:14px;background:#111a2e;color:#cfe1ff;padding:10px 12px;border-radius:12px;font-size:12px;opacity:.95";
-  banner.textContent = `Loaded: ${stage}/${week} • key=${key}`;
-  document.body.appendChild(banner);
+  window.cloudSave = async function ({ stage, week, data }) {
+    const base = getApiBase();
+    if (!base) throw new Error("Missing API base URL");
+    const token = await window.getAccessToken();
+    if (!token) throw new Error("Missing access token");
 
-  // Example local save/load (you’ll wire this to your existing UI or later API)
-  window.saveLocalProgress = (data) => localStorage.setItem(key, JSON.stringify(data));
-  window.loadLocalProgress = () => {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : null;
+    const res = await fetch(`${base}/progress`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ stage, week, data }),
+    });
+
+    if (!res.ok) throw new Error(`Save failed: ${res.status}`);
+    return res.json();
+  };
+
+  window.cloudLoad = async function ({ stage, week }) {
+    const base = getApiBase();
+    if (!base) throw new Error("Missing API base URL");
+    const token = await window.getAccessToken();
+    if (!token) throw new Error("Missing access token");
+
+    const res = await fetch(`${base}/progress?stage=${encodeURIComponent(stage)}&week=${encodeURIComponent(week)}`, {
+      headers: { "Authorization": `Bearer ${token}` },
+    });
+
+    if (!res.ok) throw new Error(`Load failed: ${res.status}`);
+    return res.json();
   };
 })();
-
-// ---- Cloudflare Worker (Phase A: public KV) helpers ----
-window.cloudSave = async function ({ stage, week, data }) {
-  const base = window.APP_CONFIG?.API_URL;
-  if (!base) throw new Error("Missing API_URL in assets/config.js");
-
-  const res = await fetch(`${base}/progress`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ stage, week, data }),
-  });
-
-  if (!res.ok) throw new Error(`Save failed: ${res.status}`);
-  return res.json();
-};
-
-window.cloudLoad = async function ({ stage, week }) {
-  const base = window.APP_CONFIG?.API_URL;
-  if (!base) throw new Error("Missing API_URL in assets/config.js");
-
-  const res = await fetch(`${base}/progress?stage=${encodeURIComponent(stage)}&week=${encodeURIComponent(week)}`);
-  if (!res.ok) throw new Error(`Load failed: ${res.status}`);
-  return res.json();
-};

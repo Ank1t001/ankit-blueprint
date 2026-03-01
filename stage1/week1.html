@@ -11,7 +11,7 @@
   const API_URL = 'https://study-api.ankit-2b7.workers.dev';
   const AUTH0_DOMAIN    = 'taskmanager.ca.auth0.com';
   const AUTH0_CLIENT_ID = 'rjZU0a141NKQYyA7fwKDIAiJIo2T60Pq';
-  const AUTH0_AUDIENCE  = 'https://task-manager-user/api';
+  const AUTH0_AUDIENCE  = 'https://ankit-blueprint-api';
 </script>
 <!-- Auth0 SPA SDK -->
 <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
@@ -2648,7 +2648,7 @@ function setSyncStatus(state) {
 async function loadAnnotations() {
   try {
     setSyncStatus('syncing');
-    const res = await fetch(`${API_URL}/progress?stage=stage1&week=week1`);
+    const res = await fetch(`${API_URL}/progress?stage=stage1&week=week1`, { headers: authHeaders() });
     if (!res.ok) throw new Error('API error');
     const payload = await res.json();
     const remote = payload && payload.annotations ? payload.annotations : [];
@@ -2693,25 +2693,29 @@ async function syncAllToAPI() {
     return null;
   }).filter(Boolean);
 
-  if (drawStrokes.length > 0) {
-    payload.push({ id: WEEK_ID+'_drawing', type:'drawing', week_id:WEEK_ID, strokes: drawStrokes });
-  }
+  // Include drawing strokes as a special record
+  const data = {
+    annotations: payload,
+    drawing: drawStrokes && drawStrokes.length ? { week_id: WEEK_ID, strokes: drawStrokes } : null,
+    updatedAt: Date.now()
+  };
 
   setSyncStatus('syncing');
   try {
-    await Promise.all(payload.map(ann =>
-      fetch(`${API_URL}/annotations`, {
-        method: 'POST', headers: authHeaders(), body: JSON.stringify(ann)
-      })
-    ));
+    const res = await fetch(`${API_URL}/progress`, {
+      method: 'POST',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stage: 'stage1', week: 'week1', data })
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
     setSyncStatus('saved');
   } catch(e) { setSyncStatus(''); }
 }
 
-async function apiDelete(id) {
+async function apiDeleteasync function apiDelete(id) {
   if (!accessToken) return;
   try {
-    await fetch(`${API_URL}/annotations?id=${encodeURIComponent(id)}`, {
+    await fetch(`${API_URL}/progress?id=${encodeURIComponent(id)}`, {
       method: 'DELETE', headers: authHeaders()
     });
   } catch(e) {}
@@ -2720,7 +2724,7 @@ async function apiDelete(id) {
 async function apiClearAll() {
   if (!accessToken) return;
   try {
-    await fetch(`${API_URL}/annotations?week_id=${WEEK_ID}`, {
+    await fetch(`${API_URL}/progress?week_id=${WEEK_ID}`, {
       method: 'DELETE', headers: authHeaders()
     });
   } catch(e) {}
@@ -3279,6 +3283,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+
+
+<script>
+  window.STAGE_ID = "stage1";
+  window.WEEK_ID = "week1";
+</script>
+<script src="/assets/app.js"></script>
 
 </body>
 </html>
