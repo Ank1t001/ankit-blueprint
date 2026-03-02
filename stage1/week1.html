@@ -3298,6 +3298,7 @@ function showToast(msg) {
 document.addEventListener('DOMContentLoaded', () => {
   initCanvas();
   initAuth();  // Auth0 handles loadAnnotations after sign-in
+  loadAnnotations(); // Also load from cloud directly on page load
 
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
