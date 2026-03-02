@@ -2597,6 +2597,22 @@ function markDone(n) {
   btn.disabled = true;
   document.querySelector('[data-day="' + n + '"]').classList.add('done');
   updateProgress();
+  // Save to localStorage
+  localStorage.setItem('done_stage1_week1', JSON.stringify([...done]));
+}
+
+function loadProgress() {
+  const saved = localStorage.getItem('done_stage1_week1');
+  if (saved) {
+    JSON.parse(saved).forEach(n => {
+      done.add(n);
+      const btn = document.getElementById('btn-' + n);
+      if (btn) { btn.textContent = '✓ Day ' + n + ' Complete'; btn.classList.add('done-state'); btn.disabled = true; }
+      const dayNav = document.querySelector('[data-day="' + n + '"]');
+      if (dayNav) dayNav.classList.add('done');
+    });
+    updateProgress();
+  }
 }
 
 function updateProgress() {
