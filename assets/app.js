@@ -43,3 +43,23 @@
     return res.json();
   };
 })();
+
+// Gate button bindings
+document.addEventListener('DOMContentLoaded', () => {
+  const btnContinue = document.getElementById('btn-gate-continue');
+  const btnSignin   = document.getElementById('btn-gate-signin');
+
+  if (btnContinue) {
+    btnContinue.addEventListener('click', () => {
+      const gateKey = `bp_access:${window.WEEK_ID}`;
+      localStorage.setItem(gateKey, '1');
+      document.getElementById('auth-overlay').classList.add('hidden');
+    });
+  }
+
+  if (btnSignin) {
+    btnSignin.addEventListener('click', () => {
+      if (typeof signIn === 'function') signIn();
+    });
+  }
+});
