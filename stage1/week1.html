@@ -2699,6 +2699,13 @@ async function loadAnnotations() {
       if (a.type === 'note')      restoreNote(a);
       if (a.type === 'drawing')   restoreDrawing(a);
     });
+
+    // Restore drawings
+    if (payload && payload.drawing && payload.drawing.strokes) {
+      drawStrokes = payload.drawing.strokes;
+      redrawCanvas();
+    }
+
     updateCount();
     return;
   } catch (e) {
