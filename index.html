@@ -1,43 +1,784 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ankit’s Blueprint — Study Plan</title>
-  <link rel="stylesheet" href="/assets/styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ankit Blueprint — Study Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:       #0e1117;
+  --ink2:      #1e2535;
+  --page:      #f5f4f0;
+  --paper:     #faf9f6;
+  --rule:      #e2dfd8;
+  --accent:    #2563eb;
+  --accent-bg: #eff4ff;
+  --muted:     #6b7280;
+  --green:     #16a34a;
+  --green-bg:  #f0fdf4;
+  --amber:     #d97706;
+  --amber-bg:  #fffbeb;
+  --purple:    #7c3aed;
+  --purple-bg: #f5f3ff;
+  --red:       #dc2626;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--ink);
+  color: #fff;
+  padding: 0 32px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.tb-brand {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #fff;
+}
+.tb-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: #6b7280;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.tb-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+#sync-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 6px #4ade8088;
+  transition: background 0.3s;
+}
+#sync-dot.off { background: #6b7280; box-shadow: none; }
+#user-badge {
+  display: none; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 4px 10px 4px 4px;
+}
+#user-badge.show { display: flex; }
+#user-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+#user-name { font-size: 12px; color: #cbd5e1; }
+#btn-logout {
+  background: none; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px;
+  color: #94a3b8; font-size: 11px; padding: 2px 8px; cursor: pointer;
+}
+#btn-logout:hover { border-color: rgba(255,100,100,0.4); color: #f87171; }
+#btn-signin {
+  background: var(--accent); color: #fff; border: none; border-radius: 6px;
+  padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--ink2);
+  color: #fff;
+  padding: 56px 48px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(37,99,235,0.18) 0%, transparent 70%),
+              radial-gradient(ellipse 40% 60% at 10% 80%, rgba(124,58,237,0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #60a5fa;
+  margin-bottom: 14px;
+}
+.hero-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 14px;
+}
+.hero-title em { font-style: italic; color: #93c5fd; }
+.hero-desc {
+  font-size: 15px;
+  color: #94a3b8;
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat-num {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+}
+.stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+/* ── MAIN ── */
+.main { max-width: 1100px; margin: 0 auto; padding: 48px 32px 80px; }
+
+/* ── CONTINUE BANNER ── */
+.continue-banner {
+  display: none;
+  background: var(--ink2);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 40px;
+  border: 1px solid rgba(37,99,235,0.3);
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.continue-banner:hover { border-color: rgba(37,99,235,0.6); }
+.continue-banner.show { display: flex; }
+.cb-icon { font-size: 24px; }
+.cb-body { flex: 1; }
+.cb-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1.5px; color: #60a5fa; text-transform: uppercase; margin-bottom: 3px; }
+.cb-title { font-size: 15px; font-weight: 600; color: #fff; }
+.cb-meta { font-size: 12px; color: #6b7280; margin-top: 2px; }
+.cb-arrow { font-size: 20px; color: #60a5fa; }
+
+/* ── OVERALL PROGRESS ── */
+.overall-progress {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 48px;
+}
+.op-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.op-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.op-pct { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--accent); }
+.op-bar { height: 6px; background: var(--rule); border-radius: 3px; overflow: hidden; }
+.op-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #60a5fa); border-radius: 3px; transition: width 0.8s ease; }
+
+/* ── STAGE SECTIONS ── */
+.stage-section { margin-bottom: 48px; }
+.stage-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--rule);
+}
+.stage-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.s1 .stage-badge { background: var(--accent-bg); color: var(--accent); }
+.s2 .stage-badge { background: var(--green-bg); color: var(--green); }
+.s3 .stage-badge { background: var(--amber-bg); color: var(--amber); }
+.s4 .stage-badge { background: var(--purple-bg); color: var(--purple); }
+
+.stage-title {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.stage-weeks {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: auto;
+}
+.stage-progress {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ── WEEK CARDS GRID ── */
+.weeks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* ── WEEK CARD ── */
+.week-card {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  position: relative;
+}
+.week-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); border-color: #c5c0b8; }
+.week-card.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
+.week-card.locked { opacity: 0.5; cursor: default; pointer-events: none; }
+.week-card.locked:hover { transform: none; box-shadow: none; }
+
+.wc-accent-bar { height: 3px; background: var(--rule); }
+.s1 .wc-accent-bar { background: linear-gradient(90deg, var(--accent), #93c5fd); }
+.s2 .wc-accent-bar { background: linear-gradient(90deg, var(--green), #86efac); }
+.s3 .wc-accent-bar { background: linear-gradient(90deg, var(--amber), #fcd34d); }
+.s4 .wc-accent-bar { background: linear-gradient(90deg, var(--purple), #c4b5fd); }
+
+.wc-body { padding: 20px 20px 16px; }
+.wc-week-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.wc-title {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.2px;
+  margin-bottom: 8px;
+}
+.wc-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 16px;
+}
+.wc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.wc-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--page);
+  border: 1px solid var(--rule);
+  color: var(--muted);
+}
+
+.wc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-top: 1px solid var(--rule);
+}
+.wc-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+}
+.wc-status.done  { color: var(--green); }
+.wc-status.inprogress { color: var(--accent); }
+.wc-status.todo  { color: var(--muted); }
+.wc-status.locked { color: var(--muted); }
+
+.wc-progress-ring { position: relative; width: 36px; height: 36px; }
+.wc-progress-ring svg { transform: rotate(-90deg); }
+.wc-progress-ring circle {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.ring-bg  { stroke: var(--rule); }
+.ring-fill { stroke: var(--accent); transition: stroke-dashoffset 0.8s ease; }
+.ring-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* ── COMING SOON CARD ── */
+.week-card.coming-soon { background: var(--page); }
+.cs-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  background: var(--rule);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+/* ── AUTH OVERLAY ── */
+#auth-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(14,17,23,0.88);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+}
+#auth-overlay.hidden { display: none; }
+.auth-card {
+  background: var(--ink2);
+  border-radius: 16px;
+  padding: 44px 40px;
+  max-width: 380px; width: 90%;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+.auth-logo { font-family: 'Fraunces', serif; font-size: 26px; color: #fff; margin-bottom: 6px; }
+.auth-sub  { font-size: 13px; color: #94a3b8; margin-bottom: 20px; font-family: 'DM Mono', monospace; letter-spacing: 1px; text-transform: uppercase; font-size: 10px; }
+.auth-desc { font-size: 14px; color: #cbd5e1; margin-bottom: 28px; line-height: 1.65; }
+.auth-features { text-align: left; margin-bottom: 28px; display: flex; flex-direction: column; gap: 10px; }
+.auth-feat { display: flex; align-items: flex-start; gap: 10px; }
+.auth-feat-icon { font-size: 14px; margin-top: 1px; }
+.auth-feat-text { font-size: 13px; color: #94a3b8; line-height: 1.45; }
+.auth-btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 12px 28px; font-size: 15px; font-weight: 600; cursor: pointer;
+  width: 100%; transition: background 0.2s;
+}
+.auth-btn:hover { background: #1d4ed8; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .hero { padding: 36px 24px 32px; }
+  .main { padding: 32px 20px 60px; }
+  .weeks-grid { grid-template-columns: 1fr 1fr; }
+  .hero-stats { gap: 20px; }
+}
+@media (max-width: 480px) {
+  .weeks-grid { grid-template-columns: 1fr; }
+  .topbar { padding: 0 16px; }
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stage-section { animation: fadeUp 0.4s ease both; }
+.stage-section:nth-child(1) { animation-delay: 0.05s; }
+.stage-section:nth-child(2) { animation-delay: 0.1s; }
+.stage-section:nth-child(3) { animation-delay: 0.15s; }
+.stage-section:nth-child(4) { animation-delay: 0.2s; }
+</style>
 </head>
 <body>
-  <main class="container">
-    <h1>Ankit’s Blueprint — Study Plan</h1>
 
-    <section>
-      <h2>Stage 1</h2>
-      <ul>
-        <li><a href="/stage1/week1.html">Week 1</a></li>
-        <li><a href="/stage1/week2.html">Week 2</a></li>
-        <li><a href="/stage1/week3.html">Week 3</a></li>
-        <li><a href="/stage1/week4.html">Week 4</a></li>
-      </ul>
-    </section>
+<!-- CONFIG -->
+<script>
+  const AUTH0_DOMAIN    = 'taskmanager.ca.auth0.com';
+  const AUTH0_CLIENT_ID = 'rjZU0a141NKQYyA7fwKDIAiJIo2T60Pq';
+  const AUTH0_AUDIENCE  = 'https://ankit-blueprint-api';
+  const API_URL         = 'https://study-api.ankit-2b7.workers.dev';
 
-    <section>
-      <h2>Stage 2</h2>
-      <ul>
-        <li><a href="/stage2/week5.html">Week 5</a></li>
-        <li><a href="/stage2/week6.html">Week 6</a></li>
-        <li><a href="/stage2/week7.html">Week 7</a></li>
-      </ul>
-    </section>
+  // ── CURRICULUM ──────────────────────────────────────────────────
+  // TO ADD A NEW WEEK: just add an entry here with {file: 'yourfile.html'}
+  // Status is auto-calculated from cloud progress.
+  const CURRICULUM = [
+    {
+      id: 'stage1',
+      label: 'Stage 1',
+      title: 'Cloud & Security Foundations',
+      colorClass: 's1',
+      weeks: [
+        {
+          id: 'stage1_week1',
+          label: 'Week 1',
+          title: 'Cloud Fundamentals',
+          desc: 'What the cloud is, how it\'s structured, shared responsibility model, AWS service categories.',
+          tags: ['AWS', 'Cloud Concepts', 'IaaS/PaaS/SaaS'],
+          file: 'week1_phaseB.html',
+          hours: 8,
+          days: 5,
+        },
+        // ── ADD FUTURE WEEKS BELOW ──
+        { id: 'stage1_week2', label: 'Week 2', title: 'AWS Core Services', desc: 'EC2, S3, VPC, IAM — the building blocks you\'ll use every day.', tags: ['EC2', 'S3', 'IAM', 'VPC'], file: null, hours: 8, days: 5 },
+        { id: 'stage1_week3', label: 'Week 3', title: 'Networking & Security Groups', desc: 'VPC design, subnets, NACLs, security groups, and routing.', tags: ['VPC', 'Networking', 'NACLs'], file: null, hours: 8, days: 5 },
+        { id: 'stage1_week4', label: 'Week 4', title: 'IAM Deep Dive', desc: 'Roles, policies, MFA, least privilege, and identity federation.', tags: ['IAM', 'Identity', 'Security'], file: null, hours: 8, days: 5 },
+      ]
+    },
+    {
+      id: 'stage2',
+      label: 'Stage 2',
+      title: 'Cloud Security Architecture',
+      colorClass: 's2',
+      weeks: [
+        { id: 'stage2_week5', label: 'Week 5', title: 'Threat Modelling', desc: 'STRIDE, attack surfaces, cloud-specific threat vectors and mitigation.', tags: ['Threat Modelling', 'STRIDE'], file: null, hours: 10, days: 5 },
+        { id: 'stage2_week6', label: 'Week 6', title: 'Zero Trust Architecture', desc: 'Never trust, always verify — designing ZTA for cloud workloads.', tags: ['Zero Trust', 'Architecture'], file: null, hours: 10, days: 5 },
+        { id: 'stage2_week7', label: 'Week 7', title: 'Data Security & Encryption', desc: 'KMS, encryption at rest/transit, secrets management.', tags: ['KMS', 'Encryption', 'Secrets'], file: null, hours: 10, days: 5 },
+        { id: 'stage2_week8', label: 'Week 8', title: 'Compliance & Governance', desc: 'PIPEDA, SOC 2, PCI-DSS, AWS Config, CloudTrail auditing.', tags: ['PIPEDA', 'Compliance', 'Audit'], file: null, hours: 10, days: 5 },
+      ]
+    },
+    {
+      id: 'stage3',
+      label: 'Stage 3',
+      title: 'Certifications & Hands-On Labs',
+      colorClass: 's3',
+      weeks: [
+        { id: 'stage3_week9',  label: 'Week 9',  title: 'AWS Cloud Practitioner Prep', desc: 'Practice exams, exam strategy, and high-frequency topics review.', tags: ['CLF-C02', 'Exam Prep'], file: null, hours: 12, days: 5 },
+        { id: 'stage3_week10', label: 'Week 10', title: 'AWS Security Specialty Intro', desc: 'SCS-C02 overview, incident response, and detective controls.', tags: ['SCS-C02', 'Incident Response'], file: null, hours: 12, days: 5 },
+        { id: 'stage3_week11', label: 'Week 11', title: 'Terraform & IaC Security', desc: 'Infra-as-code, policy-as-code, tfsec, and secure pipelines.', tags: ['Terraform', 'IaC', 'DevSecOps'], file: null, hours: 12, days: 5 },
+        { id: 'stage3_week12', label: 'Week 12', title: 'Container & Kubernetes Security', desc: 'Docker, ECS, EKS, image scanning, runtime security.', tags: ['Docker', 'EKS', 'K8s'], file: null, hours: 12, days: 5 },
+      ]
+    },
+    {
+      id: 'stage4',
+      label: 'Stage 4',
+      title: 'Job Transition & Portfolio',
+      colorClass: 's4',
+      weeks: [
+        { id: 'stage4_week13', label: 'Week 13', title: 'Portfolio Projects', desc: 'Build 2-3 cloud security projects to demonstrate employer-ready skills.', tags: ['Projects', 'Portfolio'], file: null, hours: 15, days: 5 },
+        { id: 'stage4_week14', label: 'Week 14', title: 'Interview Preparation', desc: 'System design, behavioural questions, and live coding prep.', tags: ['Interviews', 'System Design'], file: null, hours: 12, days: 5 },
+        { id: 'stage4_week15', label: 'Week 15', title: 'Role Targeting & Outreach', desc: 'Resume, LinkedIn, cold outreach strategy for tech roles in Canada.', tags: ['Resume', 'LinkedIn', 'Canada'], file: null, hours: 8, days: 5 },
+      ]
+    }
+  ];
+</script>
 
-    <section>
-      <h2>Stage 3</h2>
-      <p>Coming soon.</p>
-    </section>
+<script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 
-    <section>
-      <h2>Stage 4</h2>
-      <p>Coming soon.</p>
-    </section>
-  </main>
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <span class="tb-brand">Ankit Blueprint</span>
+  <span class="tb-sub">Study Portal</span>
+  <div class="tb-right">
+    <div id="sync-dot" class="off" title="Not synced"></div>
+    <div id="user-badge">
+      <img id="user-avatar" src="" alt="">
+      <span id="user-name"></span>
+      <button id="btn-logout" onclick="signOut()">sign out</button>
+    </div>
+    <button id="btn-signin" onclick="signIn()" style="display:none">Sign In</button>
+  </div>
+</header>
+
+<!-- ── AUTH OVERLAY ── -->
+<div id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-logo">Ankit Blueprint</div>
+    <div class="auth-sub">Cloud Security Study Program</div>
+    <div class="auth-features">
+      <div class="auth-feat"><span class="auth-feat-icon">🔆</span><span class="auth-feat-text">Highlights, notes & drawings sync across all your devices</span></div>
+      <div class="auth-feat"><span class="auth-feat-icon">📍</span><span class="auth-feat-text">Resume exactly where you left off — always</span></div>
+      <div class="auth-feat"><span class="auth-feat-icon">📊</span><span class="auth-feat-text">Track progress across all 15 weeks & 4 stages</span></div>
+    </div>
+    <button class="auth-btn" onclick="signIn()">Sign in to Continue →</button>
+  </div>
+</div>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-label">15-Month Transition Plan</div>
+  <h1 class="hero-title">Your <em>Blueprint</em><br>to Cloud Security</h1>
+  <p class="hero-desc">A structured study program covering Cloud Foundations → Security Architecture → Certifications → Job Transition. Built for your career switch into Cloud Security Engineering.</p>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num">4</span><span class="stat-label">Stages</span></div>
+    <div class="stat"><span class="stat-num">15</span><span class="stat-label">Weeks</span></div>
+    <div class="stat"><span class="stat-num" id="total-hours">160</span><span class="stat-label">Study Hours</span></div>
+    <div class="stat"><span class="stat-num" id="hero-progress">0%</span><span class="stat-label">Complete</span></div>
+  </div>
+</section>
+
+<!-- ── MAIN ── -->
+<main class="main" id="main-content" style="display:none">
+
+  <!-- CONTINUE BANNER -->
+  <div class="continue-banner" id="continue-banner" onclick="openLastStudied()">
+    <div class="cb-icon">▶️</div>
+    <div class="cb-body">
+      <div class="cb-label">Continue Where You Left Off</div>
+      <div class="cb-title" id="cb-title">—</div>
+      <div class="cb-meta" id="cb-meta">—</div>
+    </div>
+    <div class="cb-arrow">→</div>
+  </div>
+
+  <!-- OVERALL PROGRESS -->
+  <div class="overall-progress">
+    <div class="op-top">
+      <span class="op-label">Overall Progress</span>
+      <span class="op-pct" id="op-pct">0%</span>
+    </div>
+    <div class="op-bar"><div class="op-fill" id="op-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- STAGE SECTIONS (rendered by JS) -->
+  <div id="stages-container"></div>
+
+</main>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────
+let auth0Client   = null;
+let accessToken   = null;
+let currentUser   = null;
+let weekProgress  = {};   // { week_id: { pct: 0-100, lastVisited: timestamp } }
+let lastStudied   = null; // { weekObj, stageObj }
+
+// ── AUTH ────────────────────────────────────────────────────────────
+async function initAuth() {
+  auth0Client = await auth0.createAuth0Client({
+    domain: AUTH0_DOMAIN,
+    clientId: AUTH0_CLIENT_ID,
+    authorizationParams: { redirect_uri: window.location.href.split('?')[0], audience: AUTH0_AUDIENCE }
+  });
+
+  if (location.search.includes('code=')) {
+    await auth0Client.handleRedirectCallback();
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+
+  const isAuth = await auth0Client.isAuthenticated();
+  if (isAuth) {
+    await onSignedIn();
+  } else {
+    document.getElementById('btn-signin').style.display = '';
+  }
+}
+
+async function signIn() {
+  await auth0Client.loginWithRedirect({ authorizationParams: { redirect_uri: window.location.href.split('?')[0], audience: AUTH0_AUDIENCE } });
+}
+async function signOut() {
+  await auth0Client.logout({ logoutParams: { returnTo: window.location.href.split('?')[0] } });
+}
+
+async function onSignedIn() {
+  accessToken  = await auth0Client.getTokenSilently();
+  currentUser  = await auth0Client.getUser();
+
+  // Show user badge
+  document.getElementById('user-badge').classList.add('show');
+  document.getElementById('user-name').textContent = currentUser.name || currentUser.email;
+  if (currentUser.picture) document.getElementById('user-avatar').src = currentUser.picture;
+  document.getElementById('btn-signin').style.display = 'none';
+
+  // Hide auth overlay
+  document.getElementById('auth-overlay').classList.add('hidden');
+
+  // Load progress then render
+  await loadAllProgress();
+  renderPortal();
+  document.getElementById('main-content').style.display = '';
+}
+
+function authHeaders() {
+  return accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+}
+
+// ── LOAD PROGRESS ───────────────────────────────────────────────────
+async function loadAllProgress() {
+  try {
+    document.getElementById('sync-dot').classList.remove('off');
+    const res = await fetch(`${API_URL}/progress/summary`, { headers: authHeaders() });
+    if (res.ok) {
+      const data = await res.json();
+      weekProgress = data.weeks || {};
+    }
+  } catch(e) {
+    // Fall back to empty
+    weekProgress = {};
+  }
+
+  // Find last studied from localStorage timestamps (since API may not have this)
+  findLastStudied();
+}
+
+function findLastStudied() {
+  let latest = null;
+  for (const stage of CURRICULUM) {
+    for (const week of stage.weeks) {
+      const key = `blueprint_last_${week.id}`;
+      const ts  = localStorage.getItem(key);
+      if (ts && (!latest || parseInt(ts) > latest.ts)) {
+        latest = { ts: parseInt(ts), week, stage };
+      }
+    }
+  }
+  lastStudied = latest;
+}
+
+function markWeekVisited(weekId) {
+  localStorage.setItem(`blueprint_last_${weekId}`, Date.now().toString());
+}
+
+// ── RENDER PORTAL ────────────────────────────────────────────────────
+function getWeekProgress(weekId) {
+  // Check API data first, then localStorage fallback
+  if (weekProgress[weekId] !== undefined) return weekProgress[weekId];
+  // Fallback: if week has been visited, show 10% at minimum
+  const visited = localStorage.getItem(`blueprint_last_${weekId}`);
+  return visited ? 10 : 0;
+}
+
+function renderPortal() {
+  // Overall progress
+  const allWeeks  = CURRICULUM.flatMap(s => s.weeks);
+  const totalPct  = allWeeks.reduce((sum, w) => sum + getWeekProgress(w.id), 0) / allWeeks.length;
+  const totalHrs  = allWeeks.reduce((sum, w) => sum + (w.hours || 0), 0);
+
+  document.getElementById('op-pct').textContent = Math.round(totalPct) + '%';
+  document.getElementById('op-fill').style.width = totalPct + '%';
+  document.getElementById('hero-progress').textContent = Math.round(totalPct) + '%';
+  document.getElementById('total-hours').textContent = totalHrs;
+
+  // Continue banner
+  if (lastStudied) {
+    const banner = document.getElementById('continue-banner');
+    banner.classList.add('show');
+    document.getElementById('cb-title').textContent = `${lastStudied.stage.label} · ${lastStudied.week.label} — ${lastStudied.week.title}`;
+    const d = new Date(lastStudied.ts);
+    document.getElementById('cb-meta').textContent = `Last studied ${d.toLocaleDateString('en-CA', { weekday:'long', month:'short', day:'numeric' })}`;
+  }
+
+  // Render stages
+  const container = document.getElementById('stages-container');
+  container.innerHTML = '';
+
+  for (const stage of CURRICULUM) {
+    const completedWeeks = stage.weeks.filter(w => getWeekProgress(w.id) >= 80).length;
+    const stagePct = stage.weeks.reduce((s,w) => s + getWeekProgress(w.id), 0) / stage.weeks.length;
+
+    const section = document.createElement('div');
+    section.className = `stage-section ${stage.colorClass}`;
+    section.innerHTML = `
+      <div class="stage-header">
+        <div class="stage-badge">${stage.label}</div>
+        <div class="stage-title">${stage.title}</div>
+        <div class="stage-weeks">${completedWeeks}/${stage.weeks.length} weeks · ${Math.round(stagePct)}%</div>
+      </div>
+      <div class="weeks-grid" id="grid-${stage.id}"></div>
+    `;
+    container.appendChild(section);
+
+    const grid = section.querySelector(`#grid-${stage.id}`);
+    for (const week of stage.weeks) {
+      grid.appendChild(renderWeekCard(week, stage));
+    }
+  }
+}
+
+function renderWeekCard(week, stage) {
+  const pct       = getWeekProgress(week.id);
+  const hasFile   = !!week.file;
+  const isActive  = lastStudied && lastStudied.week.id === week.id;
+  const isDone    = pct >= 80;
+  const isStarted = pct > 0 && pct < 80;
+
+  const card = document.createElement('a');
+  card.className = 'week-card' + (isActive ? ' active' : '') + (!hasFile ? ' coming-soon locked' : '');
+  if (hasFile) {
+    card.href = week.file;
+    card.addEventListener('click', () => markWeekVisited(week.id));
+  }
+
+  // Status
+  let statusHTML = '';
+  if (!hasFile) {
+    statusHTML = `<span class="wc-status locked">🔒 Coming Soon</span>`;
+  } else if (isDone) {
+    statusHTML = `<span class="wc-status done">✓ Complete</span>`;
+  } else if (isStarted) {
+    statusHTML = `<span class="wc-status inprogress">● In Progress</span>`;
+  } else {
+    statusHTML = `<span class="wc-status todo">○ Not Started</span>`;
+  }
+
+  // Tags
+  const tagsHTML = (week.tags || []).map(t => `<span class="wc-tag">${t}</span>`).join('');
+
+  // Ring
+  const r   = 14;
+  const circ = 2 * Math.PI * r;
+  const offset = circ * (1 - pct / 100);
+  const ringColor = stage.colorClass === 's1' ? '#2563eb' : stage.colorClass === 's2' ? '#16a34a' : stage.colorClass === 's3' ? '#d97706' : '#7c3aed';
+
+  card.innerHTML = `
+    <div class="wc-accent-bar"></div>
+    <div class="wc-body">
+      <div class="wc-week-label">${week.label} · ${week.hours}h · ${week.days} days</div>
+      <div class="wc-title">${week.title}</div>
+      <div class="wc-desc">${week.desc}</div>
+      <div class="wc-tags">${tagsHTML}</div>
+      ${!hasFile ? `<span class="cs-label">📅 Coming Soon</span>` : ''}
+    </div>
+    <div class="wc-footer">
+      ${statusHTML}
+      <div class="wc-progress-ring">
+        <svg width="36" height="36" viewBox="0 0 36 36">
+          <circle class="ring-bg" cx="18" cy="18" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="0"/>
+          <circle class="ring-fill" cx="18" cy="18" r="${r}" stroke="${ringColor}"
+            stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
+        </svg>
+        <div class="ring-pct">${Math.round(pct)}%</div>
+      </div>
+    </div>
+  `;
+  return card;
+}
+
+function openLastStudied() {
+  if (lastStudied && lastStudied.week.file) {
+    markWeekVisited(lastStudied.week.id);
+    window.location.href = lastStudied.week.file;
+  }
+}
+
+// ── BOOT ─────────────────────────────────────────────────────────────
+initAuth().catch(console.error);
+</script>
 </body>
 </html>
