@@ -102,13 +102,8 @@ if (btnLogout) {
         });
         window.__accessToken = token;
         if (authGate) authGate.style.display = "none";
-        startWeekApp();
-        startAutoSync();
-        return;
       } catch(e) {
-        // No session - show gate
-        if (authGate) authGate.style.display = "flex";
-        return;
+        if (authGate) authGate.style.display = "none";
       }
     }
 
