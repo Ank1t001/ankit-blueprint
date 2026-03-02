@@ -2943,7 +2943,11 @@ function highlightSelection(color) {
     const mark = createMarkEl(id, color);
     range.surroundContents(mark);
     sel.removeAllRanges();
-    annotations.push({ id, type:'highlight', color, text });
+    const startXPath  = getXPath(range.startContainer);
+    const endXPath    = getXPath(range.endContainer);
+    const startOffset = range.startOffset;
+    const endOffset   = range.endOffset;
+    annotations.push({ id, type:'highlight', color, text, startXPath, endXPath, startOffset, endOffset });
     saveAnnotations();
     showToast('✓ ' + color.charAt(0).toUpperCase() + color.slice(1) + ' highlight added');
   } catch(err) {
@@ -2956,7 +2960,11 @@ function highlightSelection(color) {
       mark.appendChild(frag);
       range.insertNode(mark);
       sel.removeAllRanges();
-      annotations.push({ id, type:'highlight', color, text });
+      const startXPath  = getXPath(range.startContainer);
+    const endXPath    = getXPath(range.endContainer);
+    const startOffset = range.startOffset;
+    const endOffset   = range.endOffset;
+    annotations.push({ id, type:'highlight', color, text, startXPath, endXPath, startOffset, endOffset });
       saveAnnotations();
       showToast('✓ ' + color.charAt(0).toUpperCase() + color.slice(1) + ' highlight added');
     } catch(e2) { showToast('⚠ Try selecting within one paragraph'); }
@@ -2984,7 +2992,50 @@ function removeHighlight(id) {
   saveToLocalStorage();
   showToast('Highlight removed');
 }
-function restoreHighlight(a) { annotations.push(a); }
+// ── XPATH HELPERS FOR PERSISTENT HIGHLIGHTS ──
+function getXPath(node) {
+  if (node.nodeType === Node.TEXT_NODE) {
+    const par = node.parentNode;
+    const xpath = getXPath(par);
+    const siblings = Array.from(par.childNodes).filter(n => n.nodeType === Node.TEXT_NODE);
+    const idx = siblings.indexOf(node);
+    return xpath + '/text()[' + (idx + 1) + ']';
+  }
+  if (node === document.body) return '/html/body';
+  const tag = node.tagName.toLowerCase();
+  const siblings = Array.from(node.parentNode.children).filter(n => n.tagName === node.tagName);
+  const idx = siblings.indexOf(node) + 1;
+  return getXPath(node.parentNode) + '/' + tag + (siblings.length > 1 ? '[' + idx + ']' : '');
+}
+
+function resolveXPath(xpath) {
+  try {
+    const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    return result.singleNodeValue;
+  } catch(e) { return null; }
+}
+
+function restoreHighlight(a) {
+  if (a.startXPath && a.endXPath) {
+    try {
+      const startNode = resolveXPath(a.startXPath);
+      const endNode   = resolveXPath(a.endXPath);
+      if (startNode && endNode) {
+        const range = document.createRange();
+        range.setStart(startNode, a.startOffset);
+        range.setEnd(endNode, a.endOffset);
+        if (!range.collapsed) {
+          const mark = createMarkEl(a.id, a.color);
+          try { range.surroundContents(mark); }
+          catch(err) { const frag = range.extractContents(); mark.appendChild(frag); range.insertNode(mark); }
+          annotations.push(a);
+          return;
+        }
+      }
+    } catch(e) {}
+  }
+  annotations.push(a);
+}
 
 /* ─────────────── NOTE MODE TAP ─────────────── */
 // Handle tap/click anywhere in note mode
