@@ -1465,23 +1465,9 @@ body.draw-mode .sidebar { pointer-events: none; }
 <!-- ═══ ANNOTATION TOOLBAR ═══ -->
 <div id="ann-toolbar">
   <!-- Highlight tools -->
-  <button class="ann-btn hl-yellow" id="btn-hl-y" onclick="setMode('yellow')" title="Highlight Yellow (Y)">
-    <span class="ann-dot y"></span><span>Yellow</span>
-  </button>
-  <button class="ann-btn hl-green" id="btn-hl-g" onclick="setMode('green')" title="Highlight Green (G)">
-    <span class="ann-dot g"></span><span>Green</span>
-  </button>
-  <button class="ann-btn hl-red" id="btn-hl-r" onclick="setMode('red')" title="Highlight Red (R)">
-    <span class="ann-dot r"></span><span>Red</span>
-  </button>
-
   <div class="ann-sep"></div>
 
   <!-- Note tool -->
-  <button class="ann-btn mode-note" id="btn-note" onclick="setMode('note')" title="Add Note (N)">
-    <span class="ann-icon">📝</span><span>Note</span>
-  </button>
-
   <div class="ann-sep"></div>
 
   <!-- ✏️ DRAW tool (pencil / S Pen) -->
@@ -1512,7 +1498,7 @@ body.draw-mode .sidebar { pointer-events: none; }
   <div class="ann-sep"></div>
 
   <!-- Counter + clear all -->
-  <span id="ann-count">0 notes</span>
+  
   <button class="ann-btn" onclick="clearAll()" title="Clear everything" style="color:rgba(255,100,100,0.7);padding:7px 8px;">
     <span class="ann-icon">✕</span>
   </button>
