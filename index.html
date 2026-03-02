@@ -420,12 +420,12 @@ body {
 <!-- CONFIG -->
 <script>
   const AUTH0_DOMAIN    = 'taskmanager.ca.auth0.com';
-  const AUTH0_CLIENT_ID = 'rjZU0a141NKQYyA7fwKDIAiJIo2T60Pq';
+  const AUTH0_CLIENT_ID = 'h2yxDp3UADpYOAlLNNKeS9MT3v9j8mvY';
   const AUTH0_AUDIENCE  = 'https://ankit-blueprint-api';
   const API_URL         = 'https://study-api.ankit-2b7.workers.dev';
 
   // ── CURRICULUM ──────────────────────────────────────────────────
-  // TO ADD A NEW WEEK: just add an entry here with {file: 'yourfile.html'}
+  // TO ADD A NEW WEEK: change file: null  →  file: '/stage1/week2.html'  (use absolute paths)
   // Status is auto-calculated from cloud progress.
   const CURRICULUM = [
     {
@@ -440,7 +440,7 @@ body {
           title: 'Cloud Fundamentals',
           desc: 'What the cloud is, how it\'s structured, shared responsibility model, AWS service categories.',
           tags: ['AWS', 'Cloud Concepts', 'IaaS/PaaS/SaaS'],
-          file: 'week1_phaseB.html',
+          file: '/stage1/week1.html',
           hours: 8,
           days: 5,
         },
