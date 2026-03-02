@@ -3015,15 +3015,42 @@ function resolveXPath(xpath) {
   } catch(e) { return null; }
 }
 
+function getTextNode(el, offset) {
+  // If el is already a text node, return it
+  if (el && el.nodeType === Node.TEXT_NODE) return el;
+  // Otherwise find the text node at the given child offset
+  if (el && el.childNodes) {
+    let idx = 0;
+    for (const child of el.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        if (idx === offset) return child;
+        idx++;
+      }
+    }
+    // fallback: first text node
+    for (const child of el.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) return child;
+    }
+  }
+  return el;
+}
+
 function restoreHighlight(a) {
   if (a.startXPath && a.endXPath) {
     try {
-      const startNode = resolveXPath(a.startXPath);
-      const endNode   = resolveXPath(a.endXPath);
+      let startNode = resolveXPath(a.startXPath);
+      let endNode   = resolveXPath(a.endXPath);
+      // If resolved to element, get first text node
+      if (startNode && startNode.nodeType !== Node.TEXT_NODE) {
+        startNode = Array.from(startNode.childNodes).find(n => n.nodeType === Node.TEXT_NODE) || startNode.firstChild;
+      }
+      if (endNode && endNode.nodeType !== Node.TEXT_NODE) {
+        endNode = Array.from(endNode.childNodes).find(n => n.nodeType === Node.TEXT_NODE) || endNode.firstChild;
+      }
       if (startNode && endNode) {
         const range = document.createRange();
-        range.setStart(startNode, a.startOffset);
-        range.setEnd(endNode, a.endOffset);
+        range.setStart(startNode, Math.min(a.startOffset, startNode.length || 0));
+        range.setEnd(endNode, Math.min(a.endOffset, endNode.length || 0));
         if (!range.collapsed) {
           const mark = createMarkEl(a.id, a.color);
           try { range.surroundContents(mark); }
@@ -3032,7 +3059,7 @@ function restoreHighlight(a) {
           return;
         }
       }
-    } catch(e) {}
+    } catch(e) { console.log('restore error', e); }
   }
   annotations.push(a);
 }
