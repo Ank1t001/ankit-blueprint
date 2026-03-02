@@ -95,8 +95,21 @@ if (btnLogout) {
 }
 
     if (!isAuthenticated) {
-      if (authGate) authGate.style.display = "flex";
-      return;
+      // Try silent login first - user may have session from portal
+      try {
+        const token = await auth0Client.getTokenSilently({
+          authorizationParams: { audience: AUTH0_AUDIENCE }
+        });
+        window.__accessToken = token;
+        if (authGate) authGate.style.display = "none";
+        startWeekApp();
+        startAutoSync();
+        return;
+      } catch(e) {
+        // No session - show gate
+        if (authGate) authGate.style.display = "flex";
+        return;
+      }
     }
 
     const token = await auth0Client.getTokenSilently({
