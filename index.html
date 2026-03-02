@@ -590,6 +590,7 @@ async function initAuth() {
 }
 
 async function signIn() {
+  if (!auth0Client) await initAuth();
   await auth0Client.loginWithRedirect({ authorizationParams: { redirect_uri: window.location.href.split('?')[0], audience: AUTH0_AUDIENCE } });
 }
 async function signOut() {
