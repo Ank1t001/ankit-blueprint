@@ -2782,7 +2782,7 @@ function saveToLocalStorage() {
       return { id:a.id, type:'note', x:el.style.left, y:el.style.top,
                text:el.querySelector('.ann-note-text').value, timestamp:a.timestamp };
     }
-    if (a.type === 'highlight') return { id:a.id, type:'highlight', color:a.color, text:a.text };
+    if (a.type === 'highlight') return { id:a.id, type:'highlight', color:a.color, text:a.text, startXPath:a.startXPath, endXPath:a.endXPath, startOffset:a.startOffset, endOffset:a.endOffset };
     return null;
   }).filter(Boolean);
   try {
