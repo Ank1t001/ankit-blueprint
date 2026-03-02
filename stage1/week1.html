@@ -2629,7 +2629,6 @@ function answer(el, groupId, correct, explainId) {
   });
   el.classList.add(correct ? 'correct' : 'wrong');
   if (!correct) {
-    // highlight correct
     opts.forEach(o => {
       if (o.onclick && o.onclick.toString().includes('true')) {
         o.classList.add('correct');
@@ -2638,6 +2637,27 @@ function answer(el, groupId, correct, explainId) {
   }
   const ex = document.getElementById(explainId);
   if (ex) ex.classList.add('show');
+  // Save quiz answer
+  const quizKey = 'quiz_stage1_week1';
+  const saved = JSON.parse(localStorage.getItem(quizKey) || '{}');
+  saved[groupId] = { correct, explainId, selectedIndex: Array.from(opts).indexOf(el) };
+  localStorage.setItem(quizKey, JSON.stringify(saved));
+}
+
+function loadQuizAnswers() {
+  const saved = JSON.parse(localStorage.getItem('quiz_stage1_week1') || '{}');
+  Object.entries(saved).forEach(([groupId, data]) => {
+    const opts = document.getElementById(groupId);
+    if (!opts) return;
+    const lis = opts.querySelectorAll('li');
+    lis.forEach(o => { o.classList.add('disabled'); o.classList.remove('correct', 'wrong'); });
+    if (lis[data.selectedIndex]) lis[data.selectedIndex].classList.add(data.correct ? 'correct' : 'wrong');
+    if (!data.correct) {
+      lis.forEach(o => { if (o.onclick && o.onclick.toString().includes('true')) o.classList.add('correct'); });
+    }
+    const ex = document.getElementById(data.explainId);
+    if (ex) ex.classList.add('show');
+  });
 }
 </script>
 
