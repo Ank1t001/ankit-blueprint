@@ -8,13 +8,9 @@
 <!-- ── CONFIG: only these 2 lines change per week ── -->
 <script>
   const WEEK_ID = 'stage1_week1';
-  const API_URL = 'https://study-api.ankit-2b7.workers.dev';
-  const AUTH0_DOMAIN    = 'taskmanager.ca.auth0.com';
-  const AUTH0_CLIENT_ID = 'h2yxDp3UADpYOAlLNNKeS9MT3v9j8mvY';
-  const AUTH0_AUDIENCE  = 'https://ankit-blueprint-api';
+  
 </script>
 <!-- Auth0 SPA SDK -->
-<script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
 <script>
   let auth0Client = null;
 
@@ -1448,7 +1444,7 @@ body.draw-mode .sidebar { pointer-events: none; }
   <div class="tb-right">
     <div class="tb-badge">AWS CCP Prep</div>
     <div class="tb-hrs">~10 hrs this week</div>
-    <span id="sync-indicator" title="Sync status">●</span>
+    
     <div id="user-badge">
       <img id="user-avatar" src="" alt="">
       <span id="user-name"></span>
@@ -1463,11 +1459,7 @@ body.draw-mode .sidebar { pointer-events: none; }
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileNav()"></div>
 
 <!-- ═══ ANNOTATION TOOLBAR ═══ -->
-<div id="ann-toolbar">
-  <!-- Highlight tools -->
-  <div class="ann-sep"></div>
-
-  <!-- Note tool -->
+<!-- Note tool -->
   <div class="ann-sep"></div>
 
   <!-- ✏️ DRAW tool (pencil / S Pen) -->
@@ -1505,8 +1497,6 @@ body.draw-mode .sidebar { pointer-events: none; }
 </div>
 
 <!-- ✏️ DRAWING CANVAS (fixed overlay, scroll-synced) -->
-<canvas id="draw-canvas"></canvas>
-
 <!-- Selection popup (appears on text select) -->
 <div id="ann-selection-popup">
 </div>
@@ -2664,7 +2654,7 @@ function setSyncStatus(state) {
   }
 }
 
-async function loadAnnotations() {
+async function
   try {
     setSyncStatus('syncing');
     const res = await fetch(`${API_URL}/progress?stage=stage1&week=week1`, { headers: authHeaders() });
@@ -3363,9 +3353,6 @@ function showToast(msg) {
 
 /* ─────────────── INIT ─────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  initCanvas();
-  initAuth();  // Auth0 handles loadAnnotations after sign-in
-  loadAnnotations(); // Also load from cloud directly on page load
 
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
