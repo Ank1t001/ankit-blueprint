@@ -2722,7 +2722,6 @@ function saveAnnotations() {
 }
 
 async function syncAllToAPI() {
-  if (!window.__accessToken) return;
   const payload = annotations.map(a => {
     if (a.type === 'note') {
       const el = document.getElementById('note-' + a.id);
